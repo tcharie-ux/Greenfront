@@ -1,0 +1,122 @@
+<div class="dashboard-layout">
+  <aside class="sidebar-container">
+    <div class="sidebar-brand">
+      <div class="brand-logo">3D</div>
+      <span class="brand-text">BuildPlan 3D</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard-client" class="nav-link">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- ESQUISSE (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, 'esquisse']" class="nav-link">
+        <i class="pi pi-pencil"></i>
+        <span>Esquisse</span>
+      </a>
+
+      <!-- 2D (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, '2d']" class="nav-link">
+        <i class="pi pi-map"></i>
+        <span>Plan 2D</span>
+      </a>
+
+      <a routerLink="/mesprojets" class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Mes Projets</span>
+      </a>
+
+      <a routerLink="/invite-architect" class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Invitation</span>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <a routerLink="/parametres" class="nav-link">
+        <i class="pi pi-user"></i>
+        <span>Profil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ currentUser?.fullName?.charAt(0) || 'U' }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ currentUser?.fullName || 'Client' }}</span>
+          <span class="user-status">En ligne</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="main-header">
+      <div class="header-actions">
+        <div class="notification-icon">
+          <i class="pi pi-bell"></i>
+          <span class="notif-badge"></span>
+        </div>
+        <div class="user-avatar">{{ initials }}</div>
+      </div>
+    </header>
+
+    <main class="page-container">
+      <button class="back-link" routerLink="/dashboard-client">
+        <i class="pi pi-arrow-left"></i> Retour
+      </button>
+
+      <div class="invite-card">
+        <div class="card-title">
+          <h2>Inviter un architecte</h2>
+        </div>
+
+        <form class="invite-form" [formGroup]="inviteForm" (ngSubmit)="sendInvitation()">
+          <div class="input-group">
+            <label>ID du projet</label>
+            <div class="input-with-icon">
+              <i class="pi pi-briefcase"></i>
+              <input type="number" placeholder="1" formControlName="idProjet" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Email de l'architecte</label>
+            <div class="input-with-icon">
+              <i class="pi pi-envelope"></i>
+              <input type="email" placeholder="architecte@example.com" formControlName="emailArchitecte" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Message personnalise (optionnel)</label>
+            <textarea
+              placeholder="Bonjour, je souhaiterais collaborer avec vous sur mon projet..."
+              formControlName="message"
+            ></textarea>
+          </div>
+
+          <div class="info-banner">
+            <div class="banner-icon">Mail</div>
+            <div class="banner-content">
+              <strong>Apercu de l'invitation</strong>
+              <p>L'architecte recevra un email avec un lien pour creer son compte et acceder au projet.</p>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button type="submit" class="btn-send" [disabled]="loading">
+              <i class="pi pi-send"></i> {{ loading ? 'Envoi...' : 'Envoyer invitation' }}
+            </button>
+            <button type="button" class="btn-cancel" routerLink="/dashboard-client">Annuler</button>
+          </div>
+
+          <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+          <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>

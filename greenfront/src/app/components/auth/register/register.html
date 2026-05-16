@@ -1,0 +1,76 @@
+<main class="register-page">
+  <section class="register-shell">
+    <article class="register-visual">
+      <img src="assets/archimorph-logo.png" alt="Logo Archimorph" class="visual-logo" />
+      <h2>Bienvenue sur ConstruoBTP.</h2>
+      <p>Creez votre compte. Bienvenue dans votre espace chantier.</p>
+    </article>
+
+    <section class="register-form-card">
+
+      <h1>{{ isArchitectRegistration ? 'Inscription architecte' : "S'inscrire" }}</h1>
+      <p class="invitation-note" *ngIf="isArchitectRegistration">
+        Finalisez votre compte avec l'adresse email invitee.
+      </p>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <label for="fullName">Nom complet</label>
+        <input id="fullName" type="text" formControlName="fullName" placeholder="Votre nom complet" />
+        <small *ngIf="registerForm.controls.fullName.touched && registerForm.controls.fullName.invalid">
+          Le nom complet est obligatoire.
+        </small>
+
+        <label for="email">Adresse e-mail</label>
+        <input id="email" type="email" formControlName="email" placeholder="votre@email.com" />
+        <small *ngIf="registerForm.controls.email.touched && registerForm.controls.email.invalid">
+          Veuillez saisir une adresse e-mail valide.
+        </small>
+
+        <label for="telephone">Telephone</label>
+        <input id="telephone" type="text" formControlName="telephone" placeholder="00 00 00 00" />
+
+        <div class="double">
+          <div>
+            <label for="password">Mot de passe</label>
+            <input id="password" type="password" formControlName="password" />
+            <small *ngIf="registerForm.controls.password.touched && registerForm.controls.password.invalid">
+              Le mot de passe doit contenir au moins 6 caracteres.
+            </small>
+          </div>
+          <div>
+            <label for="confirmPassword">Confirmer mot de passe</label>
+            <input id="confirmPassword" type="password" formControlName="confirmPassword" />
+            <small
+              *ngIf="
+                registerForm.controls.confirmPassword.touched &&
+                registerForm.controls.confirmPassword.invalid
+              "
+            >
+              La confirmation du mot de passe est obligatoire.
+            </small>
+          </div>
+        </div>
+ 
+        <label class="terms">
+          <input type="checkbox" formControlName="acceptTerms" />
+          <span>J'accepte les CGU et Politique de Confidentialite.</span>
+        </label>
+        <small
+          *ngIf="registerForm.controls.acceptTerms.touched && registerForm.controls.acceptTerms.invalid"
+        >
+          Vous devez accepter les conditions pour creer un compte.
+        </small>
+
+        <button type="submit" [disabled]="loading">
+          {{ loading ? 'Creation...' : (isArchitectRegistration ? 'Creer mon compte architecte' : 'Creer mon compte') }}
+        </button>
+      </form>
+
+      <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="redirect">
+        Deja un compte ? <a routerLink="/login">Se connecter</a>
+      </p>
+    </section>
+  </section>
+</main>

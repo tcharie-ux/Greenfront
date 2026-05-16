@@ -1,0 +1,326 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  
+  <app-sidebar
+    activeItem="mesprojets"
+    [projectId]="projectId"
+  />
+  <!-- MAIN CONTENT -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- HEADER -->
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+      <div class="flex items-center space-x-2">
+        <span class="text-gray-400">Projets /</span>
+        <span class="font-semibold text-gray-700">{{ project?.nomProjet || 'Mes projets' }}</span>
+      </div>
+      <div class="flex items-center space-x-6">
+        <div class="flex items-center space-x-2 cursor-pointer pl-6">
+          <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <span class="text-blue-600 font-bold text-xs">{{ currentUser?.fullName?.charAt(0) || 'U' }}</span>
+          </div>
+          <span class="text-sm font-medium text-gray-700">{{ currentUser?.fullName || 'Utilisateur' }}</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-8 bg-[#f8fafc]">
+      
+      <!-- LOADING / ERROR -->
+      <div *ngIf="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+
+      <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+        {{ errorMessage }}
+      </div>
+
+      <section *ngIf="!loading && !projectId" class="projects-hub">
+        <h1 class="projects-hub__title">Mes projets</h1>
+        <p class="projects-hub__subtitle">
+          Sélectionnez un projet pour accéder à l'esquisse, au plan 2D, à la vue 3D et à l'estimation.
+        </p>
+
+        <div class="projects-hub__actions">
+          <button type="button" class="projects-hub__btn projects-hub__btn--primary" (click)="createProject()">
+            <i class="pi pi-plus"></i>
+            Nouveau projet
+          </button>
+        </div>
+
+        <div *ngIf="projects.length === 0" class="projects-hub__empty">
+          <i class="pi pi-folder-open"></i>
+          <p>Aucun projet pour le moment.</p>
+          <button type="button" class="projects-hub__btn projects-hub__btn--primary" (click)="createProject()">
+            Créer mon premier projet
+          </button>
+        </div>
+
+        <div class="projects-hub__grid" *ngIf="projects.length > 0">
+          <article class="projects-hub__card" *ngFor="let p of projects">
+            <h2 class="projects-hub__card-title">{{ p.nomProjet }}</h2>
+            <p class="projects-hub__card-desc">{{ p.description || 'Sans description' }}</p>
+            <p class="projects-hub__card-meta">
+              <span [class.projects-hub__badge--done]="p.statut">{{ p.statut ? 'Terminé' : 'En cours' }}</span>
+            </p>
+            <button type="button" class="projects-hub__btn projects-hub__btn--primary" (click)="selectProject(p.id)">
+              Ouvrir le projet
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <ng-container *ngIf="!loading && project">
+        
+        <!-- PROJECT NAV BAR -->
+        <div class="flex justify-center mb-10">
+          <div class="bg-white px-10 py-5 rounded-3xl shadow-lg border border-gray-100 flex items-center space-x-16 relative">
+            
+            <!-- Step: Esquisse -->
+            <div class="step-item group" [class.active]="currentStep === 'esquisse'" (click)="setStep('esquisse')">
+              <div class="dot group-hover:scale-125 transition-transform"></div>
+              <span class="text-xs uppercase tracking-widest font-bold">Esquisse</span>
+            </div>
+
+            <!-- Step: 2D -->
+            <div class="step-item group" [class.active]="currentStep === '2d'" (click)="setStep('2d')">
+              <div class="dot group-hover:scale-125 transition-transform"></div>
+              <span class="text-xs uppercase tracking-widest font-bold">Plan 2D</span>
+            </div>
+
+            <!-- Step: 3D -->
+            <div class="step-item group" [class.active]="currentStep === '3d'" (click)="setStep('3d')">
+              <div class="dot group-hover:scale-125 transition-transform"></div>
+              <span class="text-xs uppercase tracking-widest font-bold">Vue 3D</span>
+            </div>
+
+            <!-- Step: Estimation -->
+            <div class="step-item group" [class.active]="currentStep === 'estimation'" (click)="setStep('estimation')">
+              <div class="dot group-hover:scale-125 transition-transform"></div>
+              <span class="text-xs uppercase tracking-widest font-bold">Estimation</span>
+            </div>
+
+            <!-- Progress Line Background -->
+            <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-100/50 -z-10 transform -translate-y-1/2 mx-16"></div>
+          </div>
+        </div>
+
+        <!-- CONTENT VIEWER -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
+          
+          <!-- TOP ACTIONS -->
+          <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+            <h2 class="text-xl font-bold text-gray-800 capitalize">{{ currentStep }} du projet</h2>
+            <button *ngIf="currentStep !== 'estimation'" (click)="modifier()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center space-x-2">
+              <i class="pi pi-pencil"></i>
+              <span>Modifier le plan</span>
+            </button>
+          </div>
+
+          <!-- STEP VIEWS -->
+          <div class="flex-1 p-8">
+            
+            <!-- VIEW: ESQUISSE -->
+            <div *ngIf="currentStep === 'esquisse'" class="flex flex-col items-center">
+              <div class="preview-box border-2 border-gray-100 rounded-xl w-full max-w-4xl h-[500px] flex items-center justify-center bg-gray-50 overflow-hidden">
+                <img *ngIf="sketchImageUrl" [src]="sketchImageUrl" alt="Aperçu Esquisse" class="max-w-full max-h-full object-contain" />
+                <p *ngIf="!sketchImageUrl" class="text-gray-400">Aucune esquisse enregistrée pour le moment.</p>
+              </div>
+            </div>
+
+            <!-- VIEW: 2D -->
+            <div *ngIf="currentStep === '2d'" class="flex flex-col items-center">
+              <div class="preview-box border-2 border-gray-100 rounded-xl w-full max-w-4xl h-[500px] flex items-center justify-center bg-gray-50 overflow-hidden">
+                <img *ngIf="plan2DImageUrl" [src]="plan2DImageUrl" alt="Aperçu Plan 2D" class="max-w-full max-h-full object-contain" />
+                <div *ngIf="!plan2DImageUrl" class="flex flex-col items-center">
+                   <i class="pi pi-map text-blue-200 text-6xl mb-4"></i>
+                   <p class="text-gray-400">Aucun plan 2D visualisable généré.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW: 3D -->
+            <div *ngIf="currentStep === '3d'" class="flex flex-col items-center">
+              <div class="preview-box border-2 border-gray-100 rounded-xl w-full max-w-4xl h-[500px] flex items-center justify-center bg-gray-50 overflow-hidden">
+                <img *ngIf="get3DPreview()" [src]="get3DPreview()" alt="Aperçu 3D" class="max-w-full max-h-full object-contain" />
+                <div *ngIf="!get3DPreview()" class="flex flex-col items-center">
+                   <i class="pi pi-box text-indigo-200 text-6xl mb-4"></i>
+                   <p class="text-gray-400">Aucun rendu 3D disponible. Ouvrez l'éditeur pour générer la vue.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW: ESTIMATION (EDITORIAL STYLE) -->
+            <div *ngIf="currentStep === 'estimation'">
+              
+              <!-- Warning if 3D not ready -->
+              <div *ngIf="!is3DReady" class="flex flex-col items-center justify-center h-64 text-center">
+                <div class="bg-red-50 p-8 rounded-2xl border border-red-100 max-w-md">
+                  <i class="pi pi-exclamation-triangle text-red-500 text-5xl mb-4"></i>
+                  <h3 class="text-xl font-bold text-red-700 mb-2">Estimation indisponible</h3>
+                  <p class="text-red-600">Votre plan d'estimation n'est pas disponible vous n'avez pas encore fait le plan 3D, merci de finir le projet avant !</p>
+                </div>
+              </div>
+
+              <!-- Editorial Report if 3D ready -->
+              <div *ngIf="is3DReady" class="editorial-report bg-white max-w-5xl mx-auto p-12 border border-gray-100 shadow-2xl rounded-sm font-serif">
+                
+                <div class="flex justify-between items-start mb-16">
+                  <div>
+                    <h1 class="text-5xl font-black tracking-tighter text-gray-900 mb-2">ARCHMORPH</h1>
+                    <p class="text-gray-500 italic font-sans text-sm tracking-widest">Rapport intelligent de matériaux — version éditoriale</p>
+                  </div>
+                  <div class="text-right font-sans text-sm">
+                    <p class="text-gray-400">Projet : <span class="text-gray-900 font-bold uppercase">{{ project.nomProjet }}</span></p>
+                    <p class="text-gray-400">Type : <span class="text-gray-600 font-medium">Estimation issue d'un plan 3D</span></p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                  
+                  <!-- Left Column: Table -->
+                  <div class="lg:col-span-2">
+                    <h3 class="font-sans font-bold text-gray-900 uppercase tracking-widest text-xs mb-6 pb-2 border-b-2 border-gray-900 inline-block">Détail des matériaux</h3>
+                    
+                    <table class="w-full font-sans">
+                      <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 tracking-wider">
+                        <tr>
+                          <th class="px-4 py-3 text-left">Matériaux</th>
+                          <th class="px-4 py-3 text-right">Quantité</th>
+                          <th class="px-4 py-3 text-left">Unité</th>
+                          <th class="px-4 py-3 text-right">Prix Unitaire (Est.)</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100 text-gray-800">
+                        <tr>
+                          <td class="px-4 py-4 flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                            <span>Béton</span>
+                          </td>
+                          <td class="px-4 py-4 text-right font-bold text-blue-900 text-lg">{{ materials?.concrete || '0.00' }}</td>
+                          <td class="px-4 py-4 text-gray-400 text-xs">m³</td>
+                          <td class="px-4 py-4 text-right font-medium">120 €</td>
+                        </tr>
+                        <tr>
+                          <td class="px-4 py-4 flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-300"></span>
+                            <span>Ciment</span>
+                          </td>
+                          <td class="px-4 py-4 text-right font-bold text-blue-900 text-lg">{{ materials?.cement || '0' }}</td>
+                          <td class="px-4 py-4 text-gray-400 text-xs">kg</td>
+                          <td class="px-4 py-4 text-right font-medium">0.18 €</td>
+                        </tr>
+                        <tr>
+                          <td class="px-4 py-4 flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-200"></span>
+                            <span>Sable</span>
+                          </td>
+                          <td class="px-4 py-4 text-right font-bold text-blue-900 text-lg">{{ materials?.sand || '0.00' }}</td>
+                          <td class="px-4 py-4 text-gray-400 text-xs">m³</td>
+                          <td class="px-4 py-4 text-right font-medium">35 €</td>
+                        </tr>
+                        <tr>
+                          <td class="px-4 py-4 flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-100"></span>
+                            <span>Gravier</span>
+                          </td>
+                          <td class="px-4 py-4 text-right font-bold text-blue-900 text-lg">{{ materials?.gravel || '0.00' }}</td>
+                          <td class="px-4 py-4 text-gray-400 text-xs">m³</td>
+                          <td class="px-4 py-4 text-right font-medium">40 €</td>
+                        </tr>
+                         <tr>
+                          <td class="px-4 py-4 flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                            <span>Fer</span>
+                          </td>
+                          <td class="px-4 py-4 text-right font-bold text-blue-900 text-lg">{{ materials?.iron || '0' }}</td>
+                          <td class="px-4 py-4 text-gray-400 text-xs">kg</td>
+                          <td class="px-4 py-4 text-right font-medium">1.2 €</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div class="mt-20 pt-8 border-t border-gray-100">
+                      <h4 class="font-sans font-bold text-gray-900 text-2xl mb-4">Points d'attention</h4>
+                      <p class="text-gray-500 font-sans text-sm leading-relaxed max-w-lg">
+                        Ce rapport est généré automatiquement par l'intelligence ArchMorph à partir de votre plan 3D. 
+                        Les prix affichés sont indicatifs et peuvent évoluer selon les fournisseurs, la localisation, la saison et la disponibilité des matériaux.
+                        Il est conseillé de confirmer les montants auprès des prestataires avant toute prise de décision.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Right Column: Visual Summary -->
+                  <div class="flex flex-col space-y-8">
+                    
+                    <div class="bg-orange-50/50 p-8 rounded-sm border-l-4 border-orange-200">
+                      <p class="font-sans text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Coût total estimé</p>
+                      <h2 class="text-4xl font-black text-gray-900">{{ materials?.totalCost || '0.00' }} €</h2>
+                    </div>
+
+                    <div class="p-4 border border-gray-100 rounded-sm">
+                      <h4 class="font-sans font-bold text-[10px] uppercase tracking-widest text-gray-400 mb-6">Répartition visuelle</h4>
+                      <div class="space-y-4 font-sans text-xs">
+                        <div class="space-y-1">
+                          <div class="flex justify-between"><span>Béton</span><span class="text-gray-400">{{ materials?.concrete }}</span></div>
+                          <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-orange-400" [style.width.%]="getMaterialPercentage(materials?.concrete, 'concrete')"></div>
+                          </div>
+                        </div>
+                        <div class="space-y-1">
+                          <div class="flex justify-between"><span>Ciment</span><span class="text-gray-400">{{ materials?.cement }}</span></div>
+                          <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-orange-300" [style.width.%]="getMaterialPercentage(materials?.cement, 'cement')"></div>
+                          </div>
+                        </div>
+                        <div class="space-y-1">
+                          <div class="flex justify-between"><span>Sable / Gravier</span><span class="text-gray-400">{{ (materials?.sand || 0) + (materials?.gravel || 0) }}</span></div>
+                          <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-orange-200" [style.width.%]="getMaterialPercentage((materials?.sand || 0) + (materials?.gravel || 0), 'sand')"></div>
+                          </div>
+                        </div>
+                         <div class="space-y-1">
+                          <div class="flex justify-between"><span>Fer</span><span class="text-gray-400">{{ materials?.iron }}</span></div>
+                          <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gray-400" [style.width.%]="getMaterialPercentage(materials?.iron, 'iron')"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-auto pt-12 flex flex-col items-center text-center">
+                       <div class="relative w-32 h-32 flex items-center justify-center border-2 border-dashed border-blue-100 rounded-full mb-4">
+                         <div class="absolute inset-2 border-2 border-blue-600 rounded-full opacity-20"></div>
+                         <div class="flex flex-col items-center">
+                            <span class="text-[8px] font-bold text-blue-600 uppercase tracking-widest mb-1">Estimation</span>
+                            <i class="pi pi-check text-blue-600 text-xl"></i>
+                         </div>
+                       </div>
+                       <p class="text-[9px] font-sans text-gray-400 uppercase tracking-widest leading-tight">
+                         Document généré automatiquement par ArchMorph Intelligence
+                       </p>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div class="mt-24 pt-8 border-t border-gray-100 flex justify-between items-center font-sans text-[10px] text-gray-400 uppercase tracking-widest">
+                  <p>Design de document proposé pour {{ project.nomProjet }}</p>
+                  <p>Style : éditorial architectural.</p>
+                </div>
+
+                <!-- FAB Button for PDF download -->
+                <div class="mt-12 flex justify-center">
+                   <button (click)="generatePDF()" class="bg-gray-900 text-white px-10 py-4 rounded-sm font-sans font-bold uppercase tracking-widest text-xs hover:bg-black transition-colors shadow-lg">
+                     Télécharger le rapport PDF
+                   </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+    </main>
+  </div>
+</div>

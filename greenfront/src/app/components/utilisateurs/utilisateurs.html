@@ -1,0 +1,110 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  <aside class="sidebar-container">
+    <div class="sidebar-brand">
+      <div class="brand-logo">3D</div>
+      <span class="brand-text">BuildPlan 3D</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard-client" class="nav-link">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- ESQUISSE (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, 'esquisse']" class="nav-link">
+        <i class="pi pi-pencil"></i>
+        <span>Esquisse</span>
+      </a>
+
+      <!-- 2D (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, '2d']" class="nav-link">
+        <i class="pi pi-map"></i>
+        <span>Plan 2D</span>
+      </a>
+
+      <a routerLink="/mesprojets" class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Mes Projets</span>
+      </a>
+
+      <a routerLink="/invite-architect" class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Invitation</span>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <a routerLink="/parametres" class="nav-link">
+        <i class="pi pi-user"></i>
+        <span>Profil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div class="user-details">
+          <span class="user-name">Administrateur</span>
+          <span class="user-status">En ligne</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center px-8">
+      <span class="font-semibold text-gray-700">Utilisateurs</span>
+    </header>
+    <main class="flex-1 overflow-y-auto p-8">
+      <main class="users-page">
+        <section class="users-shell">
+          <div class="users-header">
+            <div>
+              <p class="eyebrow">Administration</p>
+              <h1>Liste des utilisateurs</h1>
+              <p class="subtitle">Consultez les comptes disponibles dans l'application.</p>
+            </div>
+
+            <div class="header-actions">
+              <a routerLink="/accueil" class="ghost-action">Retour a l'accueil</a>
+              <button type="button" class="primary-action" (click)="loadUsers()">Actualiser</button>
+            </div>
+          </div>
+
+          <p class="state" *ngIf="loading">Chargement des utilisateurs...</p>
+          <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+          <div class="table-wrap" *ngIf="!loading && !errorMessage">
+            <table *ngIf="utilisateurs.length > 0; else emptyState">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom complet</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Direction</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let utilisateur of utilisateurs">
+                  <td>{{ utilisateur.id || '-' }}</td>
+                  <td>{{ getDisplayName(utilisateur) }}</td>
+                  <td>{{ getDisplayEmail(utilisateur) }}</td>
+                  <td>{{ getDisplayRole(utilisateur) }}</td>
+                  <td>{{ utilisateur.direction || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ng-template #emptyState>
+            <div class="empty-state">
+              <h2>Aucun utilisateur trouve</h2>
+              <p>La requete a abouti, mais aucun compte n'a ete retourne pour le moment.</p>
+            </div>
+          </ng-template>
+        </section>
+      </main>
+    </main>
+  </div>
+</div>

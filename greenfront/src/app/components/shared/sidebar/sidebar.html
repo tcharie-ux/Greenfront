@@ -1,0 +1,90 @@
+<aside class="sidebar-container">
+  <div class="sidebar-brand">
+    <div class="brand-logo">3D</div>
+    <span class="brand-text">BuildPlan 3D</span>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Navigation principale">
+    <p class="sidebar-nav__section">Général</p>
+
+    <a
+      routerLink="/dashboard-client"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-link"
+      [class.active]="activeItem === 'dashboard'"
+    >
+      <i class="pi pi-th-large" aria-hidden="true"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a
+      routerLink="/mesprojets"
+      routerLinkActive="active"
+      class="nav-link"
+      [class.active]="activeItem === 'mesprojets'"
+    >
+      <i class="pi pi-folder-open" aria-hidden="true"></i>
+      <span>Mes projets</span>
+    </a>
+
+    <p class="sidebar-nav__section">Modélisation</p>
+
+    <a
+      [routerLink]="esquisseLink()"
+      routerLinkActive="active"
+      class="nav-link"
+      [class.active]="activeItem === 'esquisse'"
+      [attr.title]="navProjectId ? 'Esquisse du projet' : 'Ouvrir Mes projets pour choisir un projet'"
+    >
+      <i class="pi pi-pencil" aria-hidden="true"></i>
+      <span>Esquisse</span>
+    </a>
+
+    <a
+      [routerLink]="plan2dLink()"
+      routerLinkActive="active"
+      class="nav-link"
+      [class.active]="activeItem === '2d'"
+      [attr.title]="navProjectId ? 'Plan 2D' : 'Ouvrir Mes projets pour choisir un projet'"
+    >
+      <i class="pi pi-map" aria-hidden="true"></i>
+      <span>Plan 2D</span>
+    </a>
+
+     
+    <p class="sidebar-nav__section">Compte</p>
+
+    <a
+      routerLink="/invite-architect"
+      routerLinkActive="active"
+      class="nav-link"
+      [class.active]="activeItem === 'invitation'"
+    >
+      <i class="pi pi-users" aria-hidden="true"></i>
+      <span>Invitation</span>
+    </a>
+
+    <div class="nav-spacer"></div>
+
+    <a
+      routerLink="/parametres"
+      routerLinkActive="active"
+      class="nav-link"
+      [class.active]="activeItem === 'profil'"
+    >
+      <i class="pi pi-user" aria-hidden="true"></i>
+      <span>Profil</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">{{ initials }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-status">En ligne</span>
+      </div>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,162 @@
+<div class="archimorph-workspace">
+  <!-- TOP HEADER -->
+  <header class="workspace-header">
+    <div class="branding">
+      <div class="logo">
+        <i class="pi pi-box"></i>
+        <span>Archimorph 2.0</span>
+      </div>
+      <div class="separator"></div>
+      <div class="project-meta">
+        <input type="text" [(ngModel)]="projectName" placeholder="Nom du projet" class="input-minimal project-title" />
+        <span class="save-status" [class.saving]="isSaving">
+          <i class="pi" [ngClass]="isSaving ? 'pi-spin pi-spinner' : 'pi-check-circle'"></i>
+          {{ statusMessage }}
+        </span>
+      </div>
+    </div>
+
+    <div class="global-actions">
+      <div class="action-group">
+        <button (click)="undo()" [disabled]="!canUndo()" title="Annuler (Ctrl+Z)"><i class="pi pi-undo"></i></button>
+        <button (click)="redo()" [disabled]="!canRedo()" title="Refaire (Ctrl+Y)"><i class="pi pi-refresh"></i></button>
+      </div>
+      <div class="separator"></div>
+      <div class="action-group mode-toggle">
+        <button class="active">2D Drawing</button>
+        <button (click)="generate3D()">3D View</button>
+      </div>
+      <div class="separator"></div>
+      <div class="action-group">
+        <button class="btn-primary" (click)="exportProject()" title="Exporter">
+          <i class="pi pi-download"></i> <span>Exporter</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace-body">
+    <!-- LEFT TOOLBAR (280px) -->
+    <aside class="tool-sidebar">
+      <div class="tool-section">
+        <h4 class="section-title">Outils</h4>
+        <div class="tool-grid">
+          <button [class.active]="currentTool === 'select'" (click)="setTool('select')" title="Sélection">
+            <i class="pi pi-cursor"></i>
+            <span>Sélection</span>
+          </button>
+          <button [class.active]="currentTool === 'wall'" (click)="setTool('wall')" title="Mur">
+            <i class="pi pi-bars"></i>
+            <span>Mur</span>
+          </button>
+          <button [class.active]="currentTool === 'room'" (click)="setTool('room')" title="Pièce">
+            <i class="pi pi-clone"></i>
+            <span>Pièce</span>
+          </button>
+          <button [class.active]="currentTool === 'door'" (click)="setTool('door')" title="Porte">
+            <i class="pi pi-sign-in"></i>
+            <span>Porte</span>
+          </button>
+          <button [class.active]="currentTool === 'window'" (click)="setTool('window')" title="Fenêtre">
+            <i class="pi pi-stop"></i>
+            <span>Fenêtre</span>
+          </button>
+          <button [class.active]="currentTool === 'delete'" (click)="setTool('delete')" title="Supprimer">
+            <i class="pi pi-trash"></i>
+            <span>Effacer</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-section">
+        <h4 class="section-title">Mobilier</h4>
+        <div class="tool-grid">
+          <button (click)="addFurniture('bed')"><i class="pi pi-box"></i><span>Lit</span></button>
+          <button (click)="addFurniture('table')"><i class="pi pi-table"></i><span>Table</span></button>
+          <button (click)="addFurniture('chair')"><i class="pi pi-user"></i><span>Chaise</span></button>
+          <button (click)="addFurniture('toilet')"><i class="pi pi-map-marker"></i><span>WC</span></button>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <!-- SELECTION PROPERTIES -->
+      <div class="tool-section selection-props" *ngIf="selectedElement">
+        <h4 class="section-title">Propriétés</h4>
+        <div class="prop-form">
+          <div class="field">
+            <label>Largeur (m)</label>
+            <input type="number" [(ngModel)]="selectedElement.dimensions!.width" (change)="onPropertyChange()" step="0.01">
+          </div>
+          <div class="field">
+            <label>{{ selectedElement.type === 'wall' ? 'Hauteur (m)' : 'Profondeur (m)' }}</label>
+            <input type="number" [(ngModel)]="selectedElement.dimensions!.height" (change)="onPropertyChange()" step="0.01">
+          </div>
+          <div class="field" *ngIf="selectedElement.type === 'wall'">
+            <label>Épaisseur (m)</label>
+            <input type="number" [(ngModel)]="selectedElement.thickness" (change)="onPropertyChange()" step="0.01">
+          </div>
+          <div class="field">
+            <label>Rotation (°)</label>
+            <input type="number" [(ngModel)]="selectedElement.rotation" (change)="onPropertyChange()">
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER CANVAS -->
+    <section class="canvas-area">
+      <div #container class="konva-viewport"></div>
+      
+      <!-- ZOOM CONTROL -->
+      <div class="zoom-controls">
+        <button (click)="changeZoom(0.9)"><i class="pi pi-minus"></i></button>
+        <span class="zoom-level">{{ (zoom * 100) | number:'1.0-0' }}%</span>
+        <button (click)="changeZoom(1.1)"><i class="pi pi-plus"></i></button>
+      </div>
+
+      <!-- HUD -->
+      <div class="canvas-hud">
+        <div class="hud-item">Snap: 10cm</div>
+        <div class="hud-item">X: {{ mousePos.x }} Y: {{ mousePos.y }}</div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL (220px) -->
+    <aside class="right-sidebar">
+      <div class="panel-section">
+        <h3 class="panel-title">Étages</h3>
+        <div class="floor-list">
+          <div class="floor-item" *ngFor="let floor of floors" 
+               [class.active]="floor.id === currentFloorId"
+               (click)="switchFloor(floor.id)">
+            <i class="pi pi-layers"></i>
+            <span>{{ floor.name }}</span>
+            <span class="level">Lvl {{ floor.level }}</span>
+          </div>
+          <button class="btn-add-floor" (click)="addNewFloor()">
+            <i class="pi pi-plus"></i> Ajouter un étage
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section bim-panel">
+        <h3 class="panel-title">Données BIM</h3>
+        <div class="bim-stats" *ngIf="materials">
+          <div class="stat-item">
+            <label>Surface Totale</label>
+            <span class="val">{{ totalArea | number:'1.2-2' }} m²</span>
+          </div>
+          <div class="stat-item">
+            <label>Volume Béton</label>
+            <span class="val">{{ materials.concrete | number:'1.2-2' }} m³</span>
+          </div>
+          <div class="stat-item">
+            <label>Coût Estimé</label>
+            <span class="val price">{{ materials.totalCost | currency:'EUR' }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>

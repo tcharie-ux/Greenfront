@@ -1,0 +1,66 @@
+<main class="login-page">
+  <section class="login-shell">
+    <section class="login-card">
+      <img src="assets/archimorph-logo.png" alt="Logo Archimorph" class="login-logo" />
+      <h1>CONNEXION</h1>
+      <p class="subtitle">Accedez a votre espace pour concevoir vos plans 2D/3D</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <label for="username">Nom d'utilisateur</label>
+        <div class="field">
+          <span class="field-icon user-icon" aria-hidden="true"></span>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="gnognookpante@gmail.com"
+          />
+        </div>
+        <small *ngIf="loginForm.controls.username.touched && loginForm.controls.username.invalid">
+          Ce champ est obligatoire.
+        </small>
+
+        <label for="password">Mot de passe</label>
+        <div class="field">
+          <span class="field-icon lock-icon" aria-hidden="true"></span>
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Votre mot de passe"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            {{ showPassword ? 'Masquer' : 'Afficher' }}
+          </button>
+        </div>
+        <small *ngIf="loginForm.controls.password.touched && loginForm.controls.password.invalid">
+          Mot de passe invalide (min. 6 caracteres).
+        </small>
+
+        <div class="login-options">
+          <a href="#" class="forgot">Mot de passe oublie ?</a>
+        </div>
+
+        <button type="submit" class="submit-button" [disabled]="loading">
+          {{ loading ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <div class="divider">
+        <span>Ou se connecter avec :</span>
+      </div>
+
+      <div class="socials">
+        <button type="button" class="social google" aria-label="Connexion Google">G</button>
+        <button type="button" class="social microsoft" aria-label="Connexion Microsoft">M</button>
+      </div>
+
+      <p class="redirect">
+        Pas encore de compte ? <a routerLink="/register">S'inscrire</a>
+      </p>
+    </section>
+  </section>
+</main>

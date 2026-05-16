@@ -1,0 +1,88 @@
+<div class="viewer-layout">
+  <div class="viewer-main">
+    <header class="viewer-header">
+      <div class="branding">
+        <i class="pi pi-box"></i>
+        <span>Archimorph 3D</span>
+      </div>
+      <div class="separator"></div>
+      <div class="project-info">
+        <h2>{{ project?.name || 'Projet Architectural' }}</h2>
+      </div>
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="takeScreenshot()">
+          <i class="pi pi-camera"></i> Screenshot
+        </button>
+        <button class="btn-primary" (click)="returnTo2D()">
+          <i class="pi pi-pencil"></i> Éditer 2D
+        </button>
+      </div>
+    </header>
+
+    <!-- THREE.JS CONTAINER -->
+    <div class="canvas-wrapper">
+      <div #rendererContainer class="three-container"></div>
+      
+      <!-- 3D OVERLAY CONTROLS -->
+      <div class="viewer-controls">
+        <div class="control-group">
+          <button (click)="toggleRoof()" [class.active]="isRoofOpen">
+            <i class="pi" [ngClass]="isRoofOpen ? 'pi-eye' : 'pi-eye-slash'"></i>
+            {{ isRoofOpen ? 'Fermer le toit' : 'Ouvrir le toit' }}
+          </button>
+        </div>
+        
+        <div class="control-group">
+          <label>Coupe Verticale</label>
+          <input type="range" min="0" max="10" step="0.1" [(ngModel)]="clipHeight" (input)="onClipChange()">
+        </div>
+
+        <div class="floor-selector-3d">
+          <button *ngFor="let floor of floors" 
+                  [class.active]="selectedFloorId === floor.id"
+                  (click)="selectFloor3D(floor.id)">
+            Lvl {{ floor.level }}
+          </button>
+          <button [class.active]="selectedFloorId === 'all'" (click)="selectFloor3D('all')">Tout</button>
+        </div>
+      </div>
+
+      <div class="viewer-loading" *ngIf="viewerLoading">
+        <div class="spinner"></div>
+        <p>Génération du modèle 3D...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIM SIDEBAR (220px) -->
+  <aside class="bim-sidebar">
+    <div class="sidebar-section">
+      <app-color-panel></app-color-panel>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Analyse BIM</h3>
+      <div class="bim-stats" *ngIf="materials">
+        <div class="stat-card">
+          <label>Béton</label>
+          <div class="val">{{ materials.concrete | number:'1.2-2' }} m³</div>
+        </div>
+        <div class="stat-card">
+          <label>Acier</label>
+          <div class="val">{{ materials.iron | number:'1.0-0' }} kg</div>
+        </div>
+        <div class="stat-card total">
+          <label>Coût Total</label>
+          <div class="val">{{ materials.totalCost | currency:'EUR' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Exportations</h3>
+      <button class="btn-export" (click)="generatePDF()">
+        <i class="pi pi-file-pdf"></i> Rapport PDF
+      </button>
+    </div>
+  </aside>
+</div>

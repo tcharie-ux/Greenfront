@@ -1,0 +1,30 @@
+<section class="color-panel">
+  <div class="panel-heading">
+    <h3>Couleurs</h3>
+    <button type="button" class="reset-button" (click)="reset()">Reinitialiser</button>
+  </div>
+
+  <div class="color-group" *ngFor="let group of groups">
+    <div class="picker-row">
+      <label [for]="group.model">{{ group.label }}</label>
+      <input
+        [id]="group.model"
+        type="color"
+        [ngModel]="getGroupColor(group)"
+        (ngModelChange)="setGroupColor(group, $event)"
+      />
+    </div>
+
+    <div class="presets" [attr.aria-label]="'Presets ' + group.label">
+      <button
+        type="button"
+        class="preset"
+        *ngFor="let preset of group.presets"
+        [title]="preset.name"
+        [style.background]="preset.hex"
+        [class.active]="getGroupColor(group) === preset.hex"
+        (click)="setGroupColor(group, preset.hex)"
+      ></button>
+    </div>
+  </div>
+</section>

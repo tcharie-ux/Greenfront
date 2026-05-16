@@ -1,0 +1,123 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  <aside class="sidebar-container">
+    <div class="sidebar-brand">
+      <div class="brand-logo">3D</div>
+      <span class="brand-text">BuildPlan 3D</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard-client" class="nav-link">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- ESQUISSE (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, 'esquisse']" class="nav-link">
+        <i class="pi pi-pencil"></i>
+        <span>Esquisse</span>
+      </a>
+
+      <!-- 2D (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, '2d']" class="nav-link">
+        <i class="pi pi-map"></i>
+        <span>Plan 2D</span>
+      </a>
+
+      <a routerLink="/mesprojets" class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Mes Projets</span>
+      </a>
+
+      <a routerLink="/invite-architect" class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Invitation</span>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <a routerLink="/parametres" class="nav-link">
+        <i class="pi pi-user"></i>
+        <span>Profil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ profile.fullName?.charAt(0) || 'U' }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ profile.fullName || 'Client' }}</span>
+          <span class="user-status">En ligne</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center px-8">
+      <span class="font-semibold text-gray-700">Paramètres du profil</span>
+    </header>
+    <main class="flex-1 overflow-y-auto p-8">
+      <div class="settings-container">
+  <h1>Profil utilisateur</h1>
+  <p class="success-message" *ngIf="loading">Chargement du profil en base...</p>
+  <p class="success-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="settings-section card">
+    <div class="section-title">
+      <i class="pi pi-user"></i> <h3>Informations</h3>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nom complet</label>
+        <input type="text" [value]="profile.fullName" (input)="profile.fullName = $any($event.target).value">
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <input type="text" [value]="profile.roleLabel" readonly>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" [value]="profile.email" (input)="profile.email = $any($event.target).value">
+    </div>
+    <div class="form-group">
+      <label>Telephone</label>
+      <input type="tel" [value]="profile.phone" (input)="profile.phone = $any($event.target).value">
+    </div>
+    <div class="form-group">
+      <label>Structure</label>
+      <input type="text" [value]="profile.company" (input)="profile.company = $any($event.target).value">
+    </div>
+    <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+    <button class="btn-primary" (click)="saveProfile()">Sauvegarder les modifications</button>
+  </section>
+
+  <section class="settings-section card mt-20">
+    <div class="section-title">
+      <i class="pi pi-bell"></i> <h3>Notifications</h3>
+    </div>
+    <div class="toggle-item">
+      <div class="toggle-text">
+        <strong>Notifications par email</strong>
+        <span>Recevoir les mises a jour des projets par email</span>
+      </div>
+      <input type="checkbox" [value]="profile.emailNotifications" (input)="profile.emailNotifications = $any($event.target).checked">
+    </div>
+    <div class="toggle-item">
+      <div class="toggle-text">
+        <strong>Notifications push</strong>
+        <span>Recevoir les alertes dans le navigateur</span>
+      </div>
+      <input type="checkbox" [value]="profile.pushNotifications" (input)="profile.pushNotifications = $any($event.target).checked">
+    </div>
+    <div class="toggle-item">
+      <div class="toggle-text">
+        <strong>Resume hebdomadaire</strong>
+        <span>Recevoir un recapitulatif sur l avancement 2D et 3D</span>
+      </div>
+      <input type="checkbox" [value]="profile.weeklySummary" (input)="profile.weeklySummary = $any($event.target).checked">
+    </div>
+  </section>
+</div>
+    </main>
+  </div>
+</div>

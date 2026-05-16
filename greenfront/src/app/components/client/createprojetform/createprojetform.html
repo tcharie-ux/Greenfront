@@ -1,0 +1,126 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  
+  <aside class="sidebar-container">
+    <div class="sidebar-brand">
+      <div class="brand-logo">3D</div>
+      <span class="brand-text">BuildPlan 3D</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard-client" class="nav-link">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- ESQUISSE (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, 'esquisse']" class="nav-link">
+        <i class="pi pi-pencil"></i>
+        <span>Esquisse</span>
+      </a>
+
+      <!-- 2D (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, '2d']" class="nav-link">
+        <i class="pi pi-map"></i>
+        <span>Plan 2D</span>
+      </a>
+
+      <a routerLink="/mesprojets" class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Mes Projets</span>
+      </a>
+
+      <a routerLink="/invite-architect" class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Invitation</span>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <a routerLink="/parametres" class="nav-link">
+        <i class="pi pi-user"></i>
+        <span>Profil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ currentUser?.fullName?.charAt(0) || 'U' }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ currentUser?.fullName || 'Client' }}</span>
+          <span class="user-status">En ligne</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- HEADER -->
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+      <div class="text-gray-400">
+        
+      </div>
+      <div class="flex items-center space-x-6">
+        <div class="relative cursor-pointer">
+          <i class="pi pi-bell text-gray-600 text-xl"></i>
+          <span class="absolute -top-1 -right-1 bg-red-500 h-2 w-2 rounded-full border-2 border-white"></span>
+        </div>
+        <div class="flex items-center space-x-2 cursor-pointer border-l pl-6">
+          <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+            <i class="pi pi-user text-gray-500"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="flex-1 overflow-y-auto p-8">
+      <div class="max-w-2xl mx-auto">
+        <div class="mb-6">
+          <button type="button" class="back-action" (click)="goBack()">
+            <span class="back-icon">←</span>
+            Retour
+          </button>
+        </div>
+
+        <section class="project-card">
+          <header class="card-header">
+            <h1>Créer un nouveau projet</h1>
+          </header>
+
+          <form class="project-form" [formGroup]="projectForm" (ngSubmit)="submitCreateProject($event)">
+            <div class="form-group">
+              <label for="projectName">Nom du projet</label>
+              <input id="projectName" type="text" placeholder="Ex: Maison familiale" formControlName="nomProjet" />
+              <div class="error-messages" *ngIf="projectForm.get('nomProjet')?.invalid && projectForm.get('nomProjet')?.touched">
+                <span *ngIf="projectForm.get('nomProjet')?.errors?.['required']">Le nom du projet est requis.</span>
+                <span *ngIf="projectForm.get('nomProjet')?.errors?.['minlength']">Le nom doit contenir au moins 3 caractères.</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input id="description" type="text" placeholder="Ex: Maison familiale avec terrasse" formControlName="description" />
+              <div class="error-messages" *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched">
+                <span *ngIf="projectForm.get('description')?.errors?.['required']">La description est requise.</span>
+                <span *ngIf="projectForm.get('description')?.errors?.['minlength']">La description doit contenir au moins 5 caractères.</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="dateCreation">Date de creation</label>
+              <input id="dateCreation" type="date" formControlName="dateCreation" />
+              <div class="error-messages" *ngIf="projectForm.get('dateCreation')?.invalid && projectForm.get('dateCreation')?.touched">
+                <span *ngIf="projectForm.get('dateCreation')?.errors?.['required']">La date de creation est requise.</span>
+              </div>
+            </div>
+            <p class="form-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Creation...' : 'Créer projet' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="cancelCreateProject()">Annuler</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>

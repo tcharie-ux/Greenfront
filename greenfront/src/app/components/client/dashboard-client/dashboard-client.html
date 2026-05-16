@@ -1,0 +1,150 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+
+  <app-sidebar
+    activeItem="dashboard"
+    [projectId]="projectId"
+    [fallbackProjectId]="fallbackProjectId"
+  />
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- HEADER -->
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+      <div class="text-gray-400">
+
+      </div>
+      <div class="flex items-center space-x-6">
+        <div class="relative cursor-pointer">
+          <i class="pi pi-bell text-gray-600 text-xl"></i>
+          <span class="absolute -top-1 -right-1 bg-red-500 h-2 w-2 rounded-full border-2 border-white"></span>
+        </div>
+        <div class="flex items-center space-x-2 cursor-pointer border-l pl-6">
+          <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+            <i class="pi pi-user text-gray-500"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-8">
+
+      <section class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Bonjour {{ currentUser?.fullName || 'Client' }}</h1>
+        <p class="text-gray-500 mt-1">Voici un apercu de vos projets reels en base</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">{{ metrics[0]?.label }}</p>
+              <p class="text-3xl font-bold text-gray-800">{{ metrics[0]?.value }}</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-lg">
+              <i class="pi pi-briefcase text-blue-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">{{ metrics[1]?.label }}</p>
+              <p class="text-3xl font-bold text-gray-800">{{ metrics[1]?.value }}</p>
+            </div>
+            <div class="bg-yellow-100 p-3 rounded-lg">
+              <i class="pi pi-clock text-yellow-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">{{ metrics[2]?.label }}</p>
+              <p class="text-3xl font-bold text-gray-800">{{ metrics[2]?.value }}</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+              <i class="pi pi-check-circle text-green-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">{{ metrics[3]?.label }}</p>
+              <p class="text-3xl font-bold text-gray-800">{{ metrics[3]?.value }}</p>
+            </div>
+            <div class="bg-gray-100 p-3 rounded-lg">
+              <i class="pi pi-envelope text-gray-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="mb-8">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Actions rapides</h2>
+        <div class="flex space-x-4">
+          <a routerLink="/create-projet" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-home"></i>
+            <span>Créer un projet</span>
+          </a>
+
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        <div class="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-gray-50 flex items-center space-x-2">
+            <i class="pi pi-folder-open text-yellow-500"></i>
+            <h2 class="font-bold text-gray-700">Mes projets</h2>
+          </div>
+
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-400 font-semibold">
+              <tr>
+                <th class="px-6 py-4">Projet</th>
+                <th class="px-6 py-4">Client</th>
+                <th class="px-6 py-4">Statut</th>
+                <th class="px-6 py-4">Progression</th>
+                <th class="px-6 py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-gray-700">
+              <tr *ngIf="loading">
+                <td class="px-6 py-4 text-gray-500" colspan="5">Chargement des projets...</td>
+              </tr>
+              <tr *ngIf="!loading && errorMessage">
+                <td class="px-6 py-4 text-red-600" colspan="5">{{ errorMessage }}</td>
+              </tr>
+              <tr *ngIf="!loading && !errorMessage && projects.length === 0">
+                <td class="px-6 py-4 text-gray-500" colspan="5">Aucun projet trouve en base pour ce compte.</td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition" *ngFor="let project of projects">
+                <td class="px-6 py-4 font-semibold text-gray-800">{{ project.nomProjet }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ project.nomClient || currentUser?.fullName || 'Non
+                  renseigne' }}</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="text-xs px-3 py-1 rounded-full font-medium" [ngClass]="{
+                    'bg-yellow-100 text-yellow-700': !project.statut,
+                    'bg-green-100 text-green-700': project.statut
+                  }">{{ getProjectStatus(project) }}</span>
+                </td>
+                <td class="px-6 py-4 text-center text-gray-600">{{ getProjectProgress(project) }}%</td>
+                <td class="px-6 py-4">
+                  <button type="button" (click)="openProject(project.id)"
+                    class="text-blue-600 hover:underline font-medium">Ouvrir</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+      </div>
+    </main>
+  </div>
+</div>

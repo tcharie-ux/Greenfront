@@ -1,0 +1,18 @@
+<section class="page-container">
+  <div class="page-header">
+    <h1>Estimation en attente</h1>
+    <button class="btn-primary" [routerLink]="['../3d']">Retour a la 3D</button>
+  </div>
+  <p class="subtitle">
+    Le module estimation est volontairement mis en pause. Le flux est maintenant cadre jusqu a la
+    modelisation 3D pour {{ project?.name || 'ce projet' }}.
+  </p>
+
+  <div class="table-card">
+    <strong>Etat actuel</strong>
+    <p>
+      Les dimensions 2D et la structure des elements sont disponibles pour servir de base aux
+      futurs calculs de materiaux.
+    </p>
+  </div>
+</section>

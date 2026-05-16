@@ -1,0 +1,187 @@
+.sketch-wrapper {
+  background: #f8fafc;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sketch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  .title-section {
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #e2e8f0;
+      color: #475569;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    h2 { margin: 0; color: #1e293b; font-size: 24px; }
+    .status { margin: 4px 0 0; color: #64748b; font-size: 14px; }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    
+    button {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-save {
+      background: #f1f5f9;
+      color: #475569;
+      &:hover { background: #e2e8f0; }
+    }
+
+    .btn-next {
+      background: #2563eb;
+      color: white;
+      &:hover { background: #1d4ed8; transform: translateY(-1px); }
+    }
+  }
+}
+
+.editor-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  flex: 1;
+}
+
+.toolbar {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .tool-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    button {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #475569;
+      text-align: left;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+      cursor: pointer;
+
+      &:hover { background: #f8fafc; border-color: #cbd5e1; }
+      &.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      }
+    }
+
+    .btn-delete:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .btn-reset:hover { background: #f8fafc; color: #475569; }
+  }
+
+  .legend {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 6px;
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        &.wall { background: #1e293b; }
+        &.door { background: #b85c38; }
+        &.window { background: #2d7ca6; }
+      }
+    }
+  }
+}
+
+.canvas-viewport {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(#f1f5f9 1px, transparent 1px),
+      linear-gradient(90deg, #f1f5f9 1px, transparent 1px);
+    background-size: 25px 25px;
+    cursor: crosshair;
+  }
+
+  .canvas-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+
+    .onboarding {
+      text-align: center;
+      .big-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+      h3 { color: #1e293b; margin: 0; }
+      p { color: #64748b; margin: 8px 0 0; }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .editor-body { grid-template-columns: 1fr; }
+  .toolbar { flex-direction: row; flex-wrap: wrap; }
+}

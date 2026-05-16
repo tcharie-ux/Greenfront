@@ -1,0 +1,65 @@
+<div class="sketch-wrapper">
+  <div class="sketch-header">
+    <div class="title-section">
+      <span class="badge">Étape 1 : Esquisse Créative</span>
+      <h2>{{ projectName }}</h2>
+      <p class="status">{{ statusMessage }}</p>
+    </div>
+    
+    <div class="action-buttons">
+      <button (click)="save()" [disabled]="isSaving" class="btn-save">
+        <i class="icon">💾</i> {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder' }}
+      </button>
+      <button (click)="saveAndGoTo2D()" [disabled]="isSaving" class="btn-next">
+        Passer à la 2D <i class="icon">➡️</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-body">
+    <!-- Toolbar Sidebar -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <label>Outils de dessin</label>
+        <button (click)="setTool('mur')" [class.active]="currentTool === 'mur'">
+          <span class="icon">🧱</span> Mur
+        </button>
+        <button (click)="setTool('porte')" [class.active]="currentTool === 'porte'">
+          <span class="icon">🚪</span> Porte
+        </button>
+        <button (click)="setTool('fenetre')" [class.active]="currentTool === 'fenetre'">
+          <span class="icon">🪟</span> Fenêtre
+        </button>
+      </div>
+
+      <div class="tool-group">
+        <label>Actions</label>
+        <button (click)="setTool('delete')" [class.active]="currentTool === 'delete'" class="btn-delete">
+          <span class="icon">🧹</span> Effacer
+        </button>
+        <button (click)="clearSketch()" class="btn-reset">
+          <span class="icon">🔄</span> Réinitialiser
+        </button>
+      </div>
+
+      <div class="legend">
+        <label>Légende</label>
+        <div class="legend-item"><span class="dot wall"></span> Mur Maître</div>
+        <div class="legend-item"><span class="dot door"></span> Porte</div>
+        <div class="legend-item"><span class="dot window"></span> Fenêtre</div>
+      </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-viewport">
+      <canvas #canvas></canvas>
+      <div class="canvas-overlay" *ngIf="shapes.length === 0">
+        <div class="onboarding">
+          <span class="big-icon">✏️</span>
+          <h3>Commencez votre design</h3>
+          <p>Utilisez les outils à gauche pour dessiner votre plan au sol.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

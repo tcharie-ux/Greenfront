@@ -1,0 +1,33 @@
+.page-container {
+  background: white;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 16px 34px rgba(20, 51, 45, 0.08);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.subtitle {
+  color: #5f776f;
+}
+
+.table-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 18px;
+  background: #f8fbf9;
+  border: 1px solid #d8e7df;
+}
+
+.btn-primary {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #173b35;
+  color: white;
+  text-decoration: none;
+}

@@ -1,0 +1,190 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  <aside class="sidebar-container">
+    <div class="sidebar-brand">
+      <div class="brand-logo">3D</div>
+      <span class="brand-text">BuildPlan 3D</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard-client" class="nav-link">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- ESQUISSE (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, 'esquisse']" class="nav-link">
+        <i class="pi pi-pencil"></i>
+        <span>Esquisse</span>
+      </a>
+
+      <!-- 2D (Uniquement si un projet est actif) -->
+      <a *ngIf="projectId" [routerLink]="['/modelisation', projectId, '2d']" class="nav-link">
+        <i class="pi pi-map"></i>
+        <span>Plan 2D</span>
+      </a>
+
+      <a routerLink="/mesprojets" class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Mes Projets</span>
+      </a>
+
+      <a routerLink="/invite-architect" class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Invitation</span>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <a routerLink="/parametres" class="nav-link">
+        <i class="pi pi-user"></i>
+        <span>Profil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ currentUser?.fullName?.charAt(0) || 'U' }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ currentUser?.fullName || 'Client' }}</span>
+          <span class="user-status">En ligne</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+      <div class="text-gray-400">Administration</div>
+      <div class="flex items-center space-x-6">
+        <div class="relative cursor-pointer">
+          <i class="pi pi-bell text-gray-600 text-xl"></i>
+          <span class="absolute -top-1 -right-1 bg-red-500 h-2 w-2 rounded-full border-2 border-white"></span>
+        </div>
+        <div class="flex items-center space-x-2 cursor-pointer border-l pl-6">
+          <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+            <i class="pi pi-user text-gray-500"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-8">
+      <section class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Bonjour {{ currentUser?.fullName || 'Admin' }}</h1>
+        <p class="text-gray-500 mt-1">Vue admin basee sur les projets et utilisateurs reels</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Clients actifs</p>
+              <p class="text-3xl font-bold text-gray-800">{{ clientsCount }}</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-lg">
+              <i class="pi pi-users text-blue-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Projets crees</p>
+              <p class="text-3xl font-bold text-gray-800">{{ projects.length }}</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-lg">
+              <i class="pi pi-briefcase" style="color: #a855f7;"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">En cours</p>
+              <p class="text-3xl font-bold text-gray-800">{{ inProgressProjects }}</p>
+            </div>
+            <div class="bg-yellow-100 p-3 rounded-lg">
+              <i class="pi pi-clock text-yellow-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Architectes</p>
+              <p class="text-3xl font-bold text-gray-800">{{ architectsCount }}</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+              <i class="pi pi-check-circle text-green-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="mb-8">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Actions rapides</h2>
+        <div class="flex space-x-4">
+          <a routerLink="/create-projet" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-home"></i>
+            <span>Creer un projet</span>
+          </a>
+          <a routerLink="/utilisateurs" class="nav-item">
+            <i class="pi pi-user-plus"></i>
+            <span>Gerer les utilisateurs</span>
+          </a>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-gray-50 flex items-center space-x-2">
+            <i class="pi pi-folder-open text-yellow-500"></i>
+            <h2 class="font-bold text-gray-700">Projets en base</h2>
+          </div>
+
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-400 font-semibold">
+              <tr>
+                <th class="px-6 py-4">Projet</th>
+                <th class="px-6 py-4">Client</th>
+                <th class="px-6 py-4">Statut</th>
+                <th class="px-6 py-4">Architecte</th>
+                <th class="px-6 py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-gray-700">
+              <tr *ngIf="loading">
+                <td class="px-6 py-4 text-gray-500" colspan="5">Chargement du dashboard admin...</td>
+              </tr>
+              <tr *ngIf="!loading && errorMessage">
+                <td class="px-6 py-4 text-red-600" colspan="5">{{ errorMessage }}</td>
+              </tr>
+              <tr *ngIf="!loading && !errorMessage && projects.length === 0">
+                <td class="px-6 py-4 text-gray-500" colspan="5">Aucun projet trouve en base.</td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition" *ngFor="let project of projects">
+                <td class="px-6 py-4 font-semibold text-gray-800">{{ project.nomProjet }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ project.nomClient || 'Non renseigne' }}</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="text-xs px-3 py-1 rounded-full font-medium" [ngClass]="{
+                    'bg-yellow-100 text-yellow-700': !project.statut,
+                    'bg-green-100 text-green-700': project.statut
+                  }">{{ project.statut ? 'Termine' : 'En cours' }}</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="text-gray-600 font-medium">{{ project.nomArchitecte || project.emailArchitecteInvite || 'Non assigne' }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <button type="button" (click)="openProject(project.id)" class="text-blue-600 hover:underline font-medium">Ouvrir</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
